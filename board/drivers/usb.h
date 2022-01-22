@@ -941,8 +941,6 @@ void usb_outep3_resume_if_paused(void) {
   }
   EXIT_CRITICAL();
 }
-<<<<<<< HEAD
-=======
 
 void usb_soft_disconnect(bool enable) {
   if (enable) {
@@ -951,4 +949,3 @@ void usb_soft_disconnect(bool enable) {
     USBx_DEVICE->DCTL &= ~USB_OTG_DCTL_SDIS;
   }
 }
->>>>>>> 59f25a6 (continue)
