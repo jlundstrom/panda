@@ -243,20 +243,27 @@ void TIM3_IRQ_Handler(void) {
 
 // ***************************** main code *****************************
 
+uint32_t pdl0_samples[32] = {0};
+uint32_t pdl0_idx = 0;
+uint32_t pdl0_sum = 0;
 void pedal(void) {
   // read/write
-  pdl0 = adc_get(ADCCHAN_ACCEL0);
+  pdl0_sum -= pdl0_samples[pdl0_idx];
+  pdl0_samples[pdl0_idx] = adc_get(ADCCHAN_ACCEL0);
+  pdl0_sum += pdl0_samples[pdl0_idx];
+  pdl0 = pdl0_sum >> 5;
   pdl1 = adc_get(ADCCHAN_ACCEL1);
 
   // write the pedal to the DAC
   if (state == NO_FAULT) {
-    dac_set(0, MAX(gas_set_0, pdl0));
+    dac_set(0, MAX(gas_set_0, pdl0_samples[pdl0_idx]));
     dac_set(1, MAX(gas_set_1, pdl1));
   } else {
-    dac_set(0, pdl0);
+    dac_set(0, pdl0_samples[pdl0_idx]);
     dac_set(1, pdl1);
   }
 
+  pdl0_idx = (pdl0_idx + 1) % 32;
   watchdog_feed();
 }
 
